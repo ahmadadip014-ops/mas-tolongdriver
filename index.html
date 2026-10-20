@@ -2,410 +2,1910 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mas Tolong — Aplikasi Mitra Driver</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#00a86b">
+<meta name="description" content="Mas Tolong - Aplikasi Mitra Driver Ojek Serba Bisa">
+<title>Mas Tolong | Mitra Driver</title>
 
-<!-- Leaflet & Routing CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Firebase SDK -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css">
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
-:root { 
-  --blue-primary: #0264c8; 
-  --bg: #0f172a; 
-  --card-bg: #1e293b;
-  --text: #f8fafc; 
-  --text-dim: #94a3b8;
-  --green: #10b981; 
-  --red: #ef4444; 
+:root {
+  --green:#00a86b;
+  --green-dark:#008957;
+  --green-light:#e7f8ef;
+  --bg:#f4f7f6;
+  --white:#ffffff;
+  --text:#18251f;
+  --muted:#748179;
+  --border:#e7ede9;
+  --red:#e5484d;
+  --orange:#f59e0b;
+  --shadow:0 5px 22px rgba(19,55,38,.06);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg); color: var(--text); padding-bottom: 40px; }
 
-header { background: #064e3b; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-.header-title { font-size: 15px; font-weight: bold; }
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
 
-main { max-width: 480px; margin: auto; padding: 12px; }
-.card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-#driverLiveNavMap { height: 240px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #334155; }
+body {
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding-bottom:30px;
+}
 
-.btn { width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer; margin-bottom: 6px; text-align: center; }
-.btn-green { background: var(--green); color: white; }
-.btn-red { background: var(--red); color: white; }
-.btn-outline { background: transparent; border: 1.5px solid #38bdf8; color: #38bdf8; }
+button,input {
+  font:inherit;
+}
 
-.input-box { width: 100%; padding: 10px; border: 1px solid #334155; border-radius: 10px; font-size: 13px; margin-bottom: 8px; background: #0f172a; color: white; }
-.order-card { border: 1.5px solid var(--green); border-radius: 12px; padding: 12px; margin-bottom: 10px; background: #0f172a; }
+button {
+  cursor:pointer;
+}
 
-.syarat-box { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 10px; margin-bottom: 12px; font-size: 11px; color: var(--text-dim); line-height: 1.4; }
-.syarat-box b { color: #38bdf8; }
+header {
+  background:var(--green);
+  color:white;
+  padding:18px 18px 25px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-radius:0 0 24px 24px;
+  box-shadow:0 5px 18px rgba(0,168,107,.15);
+}
 
-#cameraBox { position: relative; width: 100%; max-width: 260px; margin: 10px auto; border-radius: 16px; overflow: hidden; border: 2px solid #38bdf8; background: #000; }
-#webcam, #canvasSnap { width: 100%; height: auto; display: block; transform: scaleX(-1); }
-.face-overlay { position: absolute; top: 10%; left: 15%; width: 70%; height: 80%; border: 2px dashed #10b981; border-radius: 50%; pointer-events: none; }
-.liveness-hint { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 11px; font-weight: bold; color: #38bdf8; background: rgba(0,0,0,0.85); padding: 4px; }
-.leaflet-routing-container { display: none !important; }
+.brand {
+  display:flex;
+  align-items:center;
+  gap:11px;
+}
+
+.brand-icon {
+  width:45px;
+  height:45px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:15px;
+  font-size:25px;
+}
+
+.header-title {
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+
+.header-subtitle {
+  margin-top:3px;
+  font-size:11px;
+  opacity:.9;
+}
+
+main {
+  width:100%;
+  max-width:520px;
+  margin:-9px auto 0;
+  padding:0 15px;
+  position:relative;
+}
+
+.card {
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:19px;
+  margin-bottom:15px;
+  box-shadow:var(--shadow);
+}
+
+.welcome {
+  margin-bottom:16px;
+}
+
+.welcome h2 {
+  font-size:23px;
+  font-weight:800;
+  line-height:1.35;
+  letter-spacing:-.8px;
+}
+
+.welcome p {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:7px;
+  line-height:1.7;
+}
+
+.section-title {
+  font-size:15px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.section-subtitle {
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.6;
+  margin-bottom:17px;
+}
+
+.syarat-box {
+  background:var(--green-light);
+  border:1px solid #d2f0df;
+  border-radius:14px;
+  padding:13px;
+  margin-bottom:18px;
+  color:#385b48;
+  font-size:11px;
+  line-height:1.9;
+}
+
+.syarat-box b {
+  color:var(--green-dark);
+}
+
+.field-label {
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  color:#4d5c53;
+  margin-bottom:7px;
+}
+
+.input-box {
+  display:block;
+  width:100%;
+  min-height:48px;
+  border:1px solid #dfe7e1;
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:14px;
+  background:#fbfdfb;
+  color:var(--text);
+  font-size:13px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+
+.input-box:focus {
+  border-color:var(--green);
+  box-shadow:0 0 0 3px rgba(0,168,107,.09);
+}
+
+.input-box::placeholder {
+  color:#9aa69e;
+}
+
+.btn {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  width:100%;
+  min-height:48px;
+  padding:12px 15px;
+  border:0;
+  border-radius:13px;
+  font-size:13px;
+  font-weight:800;
+  transition:transform .15s,opacity .15s;
+}
+
+.btn:active {
+  transform:scale(.98);
+}
+
+.btn-green {
+  background:var(--green);
+  color:white;
+  box-shadow:0 5px 12px rgba(0,168,107,.15);
+}
+
+.btn-green:hover {
+  background:var(--green-dark);
+}
+
+.btn-red {
+  background:var(--red);
+  color:white;
+}
+
+.btn-outline {
+  background:white;
+  border:1px solid #dce7df;
+  color:var(--green-dark);
+}
+
+.btn + .btn {
+  margin-top:9px;
+}
+
+.btn-small {
+  width:auto;
+  min-height:36px;
+  padding:8px 12px;
+  font-size:11px;
+}
+
+.auth-card {
+  padding:21px;
+}
+
+.auth-heading {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.auth-heading .big-icon {
+  width:65px;
+  height:65px;
+  display:grid;
+  place-items:center;
+  margin:0 auto 13px;
+  border-radius:21px;
+  background:var(--green-light);
+  font-size:34px;
+}
+
+.auth-heading h2 {
+  font-size:21px;
+  font-weight:800;
+  letter-spacing:-.6px;
+}
+
+.auth-heading p {
+  font-size:11px;
+  color:var(--muted);
+  margin-top:6px;
+  line-height:1.6;
+}
+
+#cameraBox {
+  position:relative;
+  width:100%;
+  max-width:250px;
+  min-height:130px;
+  margin:12px auto;
+  border-radius:18px;
+  overflow:hidden;
+  border:2px solid #cdeedd;
+  background:#10231a;
+}
+
+#webcam {
+  width:100%;
+  height:auto;
+  min-height:130px;
+  display:block;
+  object-fit:cover;
+  transform:scaleX(-1);
+}
+
+#canvasSnap {
+  display:none;
+}
+
+.face-overlay {
+  position:absolute;
+  top:8%;
+  left:22%;
+  width:56%;
+  height:82%;
+  border:2px dashed #58e6a4;
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.liveness-hint {
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  text-align:center;
+  background:rgba(0,0,0,.72);
+  color:white;
+  font-size:10px;
+  padding:9px 5px;
+}
+
+.camera-caption {
+  text-align:center;
+  font-size:10px;
+  color:var(--muted);
+  margin-bottom:12px;
+  line-height:1.6;
+}
+
+.dashboard-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:15px;
+}
+
+.driver-avatar {
+  flex-shrink:0;
+  width:49px;
+  height:49px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  background:var(--green-light);
+  font-size:26px;
+}
+
+.driver-heading {
+  flex:1;
+  min-width:0;
+}
+
+.driver-heading h3 {
+  font-size:14px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.driver-heading p {
+  font-size:10px;
+  color:var(--muted);
+  margin-top:5px;
+}
+
+.status-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  border-radius:30px;
+  background:var(--green-light);
+  color:var(--green-dark);
+  padding:7px 10px;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.status-dot {
+  width:7px;
+  height:7px;
+  background:currentColor;
+  border-radius:50%;
+}
+
+.balance-card {
+  color:white;
+  background:linear-gradient(135deg,#00a86b,#007d50);
+  border:none;
+  padding:21px;
+  overflow:hidden;
+  position:relative;
+}
+
+.balance-card:after {
+  content:"";
+  position:absolute;
+  width:160px;
+  height:160px;
+  border:25px solid rgba(255,255,255,.07);
+  border-radius:50%;
+  right:-55px;
+  top:-55px;
+}
+
+.balance-label {
+  font-size:11px;
+  color:rgba(255,255,255,.85);
+}
+
+.balance-amount {
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-1px;
+  margin:8px 0 12px;
+  overflow-wrap:anywhere;
+}
+
+.balance-footer {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:10px;
+  color:rgba(255,255,255,.9);
+}
+
+.balance-footer strong {
+  color:white;
+}
+
+.quick-info {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+  margin-bottom:15px;
+}
+
+.info-tile {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:15px;
+  box-shadow:var(--shadow);
+}
+
+.info-tile .tile-icon {
+  font-size:21px;
+  margin-bottom:10px;
+}
+
+.info-tile .tile-label {
+  font-size:10px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.info-tile .tile-value {
+  font-size:12px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.status-control {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.status-control p {
+  font-size:11px;
+  color:var(--muted);
+  margin-top:5px;
+}
+
+.status-control h4 {
+  font-size:13px;
+}
+
+.order-card {
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:15px;
+  margin-top:12px;
+  background:#fff;
+}
+
+.order-card.active {
+  border-color:#bce9d1;
+  background:#f8fffb;
+}
+
+.order-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.order-top h4 {
+  font-size:13px;
+  font-weight:800;
+}
+
+.order-badge {
+  background:#fff2d8;
+  color:#9a6400;
+  padding:6px 8px;
+  border-radius:8px;
+  font-size:9px;
+  font-weight:800;
+}
+
+.route-line {
+  display:grid;
+  grid-template-columns:18px 1fr;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.route-markers {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:3px;
+}
+
+.marker-pickup {
+  width:10px;
+  height:10px;
+  border:3px solid var(--green);
+  border-radius:50%;
+}
+
+.marker-dest {
+  width:10px;
+  height:10px;
+  background:var(--red);
+  border-radius:3px;
+}
+
+.route-stem {
+  flex:1;
+  min-height:24px;
+  border-left:1px dashed #c7d3cb;
+  margin:4px 0;
+}
+
+.route-text {
+  font-size:11px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+
+.route-text strong {
+  display:block;
+  font-size:9px;
+  color:var(--muted);
+  margin-bottom:3px;
+}
+
+.order-details {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  padding:12px 0;
+  margin:10px 0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.detail-label {
+  font-size:9px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.detail-value {
+  font-size:11px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.earnings {
+  color:var(--green-dark);
+  font-weight:800;
+}
+
+#driverLiveNavMap {
+  height:260px;
+  border-radius:15px;
+  margin:12px 0;
+  border:1px solid var(--border);
+  z-index:1;
+}
+
+.nav-info {
+  background:var(--green-light);
+  color:#285640;
+  border-radius:12px;
+  padding:12px;
+  font-size:11px;
+  line-height:1.8;
+}
+
+.alert-box {
+  background:#fff1f0;
+  border:1px solid #ffc9c6;
+  color:#9f2828;
+}
+
+.alert-box h4 {
+  font-size:13px;
+  margin-bottom:8px;
+}
+
+.alert-box p {
+  font-size:11px;
+  line-height:1.8;
+}
+
+.empty-state {
+  padding:24px 12px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.8;
+}
+
+.empty-state .empty-icon {
+  font-size:32px;
+  margin-bottom:10px;
+}
+
+.muted {
+  color:var(--muted);
+}
+
+.small {
+  font-size:10px;
+  line-height:1.7;
+}
+
+.footer {
+  text-align:center;
+  padding:12px 10px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.8;
+}
+
+.leaflet-routing-container {
+  display:none!important;
+}
+
+[hidden] {
+  display:none!important;
+}
+
+@media (min-width:600px) {
+  main {
+    padding-left:20px;
+    padding-right:20px;
+  }
+
+  .auth-card {
+    padding:28px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    transition:none!important;
+    animation:none!important;
+    scroll-behavior:auto!important;
+  }
+}
 </style>
 </head>
+
 <body>
 
 <header>
-  <div>
-    <div class="header-title">🛵 MAS TOLONG DRIVER</div>
-    <div style="font-size:10px; opacity:0.9;">Portal Mitra Kerja</div>
+  <div class="brand">
+    <div class="brand-icon">🛵</div>
+    <div>
+      <div class="header-title">MAS TOLONG</div>
+      <div class="header-subtitle">Ojek Serba Bisa · Mitra Driver</div>
+    </div>
   </div>
-  <button id="btnLogout" class="btn btn-red" style="width:auto; padding:4px 10px; font-size:11px; margin:0; display:none;" onclick="logout()">Log Out 🚪</button>
+
+  <button id="btnLogout" class="btn btn-red btn-small"
+          style="display:none" onclick="logout()">
+    Keluar ↗
+  </button>
 </header>
 
 <main>
-  <!-- AUTH / LOGIN & DAFTAR DRIVER -->
-  <div id="viewAuth" class="card">
-    <h3 id="authTitle" style="text-align:center; margin-bottom:10px;">Masuk Mitra Driver</h3>
 
-    <!-- BOX INFO SYARAT KETENTUAN -->
+  <!-- LOGIN DAN PENDAFTARAN -->
+  <section id="viewAuth" class="card auth-card">
+
+    <div class="auth-heading">
+      <div class="big-icon">🛵</div>
+      <h2 id="authTitle">Selamat Datang, Mitra!</h2>
+      <p>Masuk dan mulai perjalanan bersama Mas Tolong.</p>
+    </div>
+
     <div class="syarat-box">
-      📋 <b>Syarat Wajib Kendaraan Driver:</b><br>
-      • SIM C & STNK Aktif.<br>
-      • Helm SNI untuk Penumpang.<br>
-      • Spion Lengkap & Lampu Utama/Sein Aktif.<br>
-      • Batas Saldo Minus Deposit: <b>-Rp 25.000</b>.
+      <b>📋 Syarat Kendaraan Mitra</b><br>
+      ✓ SIM C dan STNK aktif.<br>
+      ✓ Helm SNI untuk penumpang.<br>
+      ✓ Spion lengkap dan lampu berfungsi.<br>
+      ✓ Batas saldo minus deposit: <b>Rp 25.000</b>.
     </div>
 
-    <input type="text" id="loginUsernameInput" class="input-box" placeholder="👤 Username Driver" value="ahmadadipMST0000">
-    <input type="text" id="loginWaInput" class="input-box" placeholder="📱 Nomor WhatsApp Terdaftar (08...)" value="085141145797">
-    
-    <!-- KELENGKAPAN KENDARAAN (SAAT MODE DAFTAR) -->
-    <div id="registerExtraFields" style="display:none;">
-      <input type="text" id="regPlatInput" class="input-box" placeholder="🛵 Nomor Plat Polisi Motor (cth: AG 1234 AB)">
-      <input type="text" id="regSimInput" class="input-box" placeholder="🪪 Nomor SIM C Aktif">
+    <label class="field-label" for="loginUsernameInput">
+      Username Driver
+    </label>
+    <input type="text" id="loginUsernameInput" class="input-box"
+           placeholder="Masukkan username"
+           autocomplete="username">
+
+    <label class="field-label" for="loginWaInput">
+      Nomor WhatsApp Terdaftar
+    </label>
+    <input type="tel" id="loginWaInput" class="input-box"
+           placeholder="Contoh: 08xxxxxxxxxx"
+           autocomplete="tel">
+
+    <div id="registerExtraFields" hidden>
+      <label class="field-label" for="regPlatInput">
+        Nomor Polisi Kendaraan
+      </label>
+      <input type="text" id="regPlatInput" class="input-box"
+             placeholder="Contoh: AG 1234 AB">
+
+      <label class="field-label" for="regSimInput">
+        Nomor SIM C Aktif
+      </label>
+      <input type="text" id="regSimInput" class="input-box"
+             placeholder="Masukkan nomor SIM C">
     </div>
 
-    <input type="password" id="loginPasswordInput" class="input-box" placeholder="🔒 Password (SHA-256 Protected)" value="123456">
+    <label class="field-label" for="loginPasswordInput">
+      Password
+    </label>
+    <input type="password" id="loginPasswordInput" class="input-box"
+           placeholder="Masukkan password"
+           autocomplete="current-password">
 
-    <p style="font-size:11px; color:#38bdf8; font-weight:bold; text-align:center; margin-bottom:4px;">📸 AI Verifikasi Wajah Real-Time</p>
-    <div id="cameraBox">
-      <video id="webcam" autoplay playsinline></video>
-      <div class="face-overlay"></div>
-      <div class="liveness-hint" id="livenessHint">Posisikan Wajah & Berkedip 👁️</div>
-    </div>
-    <canvas id="canvasSnap" style="display:none;"></canvas>
-    <button class="btn btn-outline" type="button" style="padding:6px; font-size:11px; margin-bottom:8px;" onclick="captureLiveFace()">📸 Ambil Foto Biometrik</button>
+    <div style="margin-top:19px">
+      <h4 style="text-align:center;font-size:13px;margin-bottom:5px">
+        📸 Verifikasi Foto Wajah
+      </h4>
+      <p class="camera-caption">
+        Izinkan akses kamera dan posisikan wajah di tengah bingkai.
+      </p>
 
-    <button class="btn btn-green" id="btnAuthAction" onclick="processLoginSubmit()">Masuk Ke Aplikasi Driver</button>
-    <button class="btn btn-outline" id="btnRegisterToggle" style="margin-top:4px;" onclick="toggleRegisterMode()">Belum Punya Akun? Daftar Driver Baru</button>
-  </div>
-
-  <!-- DASBOR DRIVER -->
-  <div id="viewDriver" style="display:none;">
-    <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px;">
-      <div>
-        <h4 id="driverDisplayName" style="font-size:14px;">Nama Driver</h4>
-        <p style="font-size:10px; color:#38bdf8;">Plat Motor: <b id="driverPlatDisplay">-</b></p>
-        <p style="font-size:11px;">Saldo Deposit: <b id="driverDepositDisplay" style="color:var(--green);">Rp 0</b></p>
-        <p style="font-size:10px; color:var(--text-dim);">Biometric: <b style="color:var(--green);">VERIFIED 📸</b> | Status: <b id="driverStatusText" style="color:var(--green);">ONLINE</b></p>
+      <div id="cameraBox">
+        <video id="webcam" autoplay playsinline muted></video>
+        <div class="face-overlay"></div>
+        <div class="liveness-hint" id="livenessHint">
+          Kamera menunggu izin
+        </div>
       </div>
-      <button class="btn btn-red" style="width:auto; padding:6px 12px; font-size:11px; margin:0;" onclick="toggleDriverOnlineStatus()">Ubah Status</button>
+
+      <canvas id="canvasSnap" hidden></canvas>
+
+      <button class="btn btn-outline" type="button"
+              onclick="captureLiveFace()">
+        📸 Ambil Foto Wajah
+      </button>
     </div>
 
-    <!-- PERINGATAN MINUS BATAS MAKSIMAL (-25.000) -->
-    <div id="driverMinusAlertBox" class="card" style="display:none; border:2px solid var(--red); background:#7f1d1d; text-align:center;">
-      <h4 style="color:#fee2e2; margin-bottom:4px;">⚠️ AKUN DITANGGUHKAN SEMENTARA</h4>
-      <p style="font-size:12px; color:#fca5a5; line-height:1.4;">
-        Saldo deposit Anda mencapai <b><span id="minusAmountDisplay">-Rp 0</span></b> (melewati batas minus maksimal -Rp 25.000).<br>
-        <b>Mohon lakukan isi saldo / Top Up ke Admin agar bisa melanjutkan pekerjaan.</b>
+    <button class="btn btn-green" id="btnAuthAction"
+            onclick="processLoginSubmit()">
+      Masuk ke Aplikasi
+    </button>
+
+    <button class="btn btn-outline" id="btnRegisterToggle"
+            onclick="toggleRegisterMode()">
+      Belum Punya Akun? Daftar Driver
+    </button>
+
+    <p class="small muted" style="text-align:center;margin-top:15px">
+      Mas Tolong · Layanan Ojek Serba Bisa
+    </p>
+  </section>
+
+
+  <!-- DASHBOARD DRIVER -->
+  <section id="viewDriver" hidden>
+
+    <div class="card">
+      <div class="dashboard-top">
+        <div class="driver-avatar">👨‍✈️</div>
+
+        <div class="driver-heading">
+          <h3 id="driverDisplayName">Mitra Driver</h3>
+          <p>Plat kendaraan: <b id="driverPlatDisplay">-</b></p>
+        </div>
+
+        <span class="status-pill" id="statusPill">
+          <span class="status-dot"></span>
+          <span id="driverStatusText">ONLINE</span>
+        </span>
+      </div>
+
+      <div class="status-control">
+        <div>
+          <h4>Status Operasional</h4>
+          <p>Atur kesiapan menerima pesanan.</p>
+        </div>
+        <button id="btnDriverStatus" class="btn btn-outline btn-small"
+                onclick="toggleDriverOnlineStatus()">
+          Ubah Status
+        </button>
+      </div>
+    </div>
+
+
+    <!-- SALDO -->
+    <div class="card balance-card">
+      <div class="balance-label">💳 Saldo Deposit Mitra</div>
+      <div class="balance-amount" id="driverDepositDisplay">
+        Rp 0
+      </div>
+      <div class="balance-footer">
+        <span>Nomor mitra</span>
+        <strong id="driverIdDisplay">-</strong>
+      </div>
+    </div>
+
+
+    <!-- INFORMASI -->
+    <div class="quick-info">
+      <div class="info-tile">
+        <div class="tile-icon">🛵</div>
+        <div class="tile-label">Kendaraan</div>
+        <div class="tile-value" id="driverPlatTile">-</div>
+      </div>
+
+      <div class="info-tile">
+        <div class="tile-icon">📡</div>
+        <div class="tile-label">Status Akun</div>
+        <div class="tile-value" id="driverAccountStatus">Aktif</div>
+      </div>
+    </div>
+
+
+    <!-- PERINGATAN SALDO -->
+    <div id="driverMinusAlertBox" class="card alert-box" hidden>
+      <h4>⚠️ Saldo Deposit Mencapai Batas</h4>
+      <p>
+        Saldo Anda: <b id="minusAmountDisplay">Rp 0</b>.<br>
+        Akun tidak dapat menerima order saat saldo mencapai
+        batas minus Rp 25.000. Silakan hubungi admin untuk
+        informasi pengisian saldo.
       </p>
     </div>
 
-    <!-- PETA NAVIGASI LIVE DRIVER -->
-    <div id="driverNavSection" class="card" style="display:none; border: 2px solid var(--blue-primary); background: #0f172a;">
-      <h4 style="color: #38bdf8; margin-bottom: 6px;">🧭 Peta Navigasi Otomatis Driver</h4>
-      <div id="driverLiveNavMap"></div>
-      <div id="driverNavInfo" style="font-size: 12px; font-weight: bold; margin-top: 6px; color: #f8fafc;">Menghitung rute...</div>
-      <button class="btn btn-green" style="margin-top: 10px; padding: 10px; font-size: 12px;" onclick="completeActiveOrder()">✅ Selesaikan Perjalanan</button>
-    </div>
 
-    <div class="card">
-      <h5 style="margin-bottom:6px; color:#38bdf8;">📡 Radar Khusus Orderan Terdekat:</h5>
-      <div id="driverOrdersList">Menunggu orderan terdekat...</div>
-    </div>
-  </div>
+    <!-- NAVIGASI -->
+    <section id="driverNavSection" class="card" hidden>
+      <h3 class="section-title">🧭 Navigasi Perjalanan</h3>
+      <p class="section-subtitle">
+        Ikuti rute dari posisi Anda menuju lokasi penjemputan
+        dan tujuan pelanggan.
+      </p>
+
+      <div id="driverLiveNavMap"></div>
+
+      <div id="driverNavInfo" class="nav-info">
+        Menyiapkan rute perjalanan...
+      </div>
+
+      <button class="btn btn-green" style="margin-top:13px"
+              onclick="completeActiveOrder()">
+        ✅ Selesaikan Perjalanan
+      </button>
+    </section>
+
+
+    <!-- DAFTAR ORDER -->
+    <section class="card">
+      <h3 class="section-title">📡 Pesanan Masuk</h3>
+      <p class="section-subtitle">
+        Pesanan yang ditujukan kepada akun mitra Anda akan
+        ditampilkan di sini.
+      </p>
+
+      <div id="driverOrdersList">
+        <div class="empty-state">
+          <div class="empty-icon">🛵</div>
+          Menunggu pesanan masuk...
+        </div>
+      </div>
+    </section>
+
+  </section>
+
+  <footer class="footer">
+    <b>MAS TOLONG</b><br>
+    Ojek Serba Bisa · Mitra Driver<br>
+    Berkendara dengan aman dan patuhi peraturan lalu lintas.
+  </footer>
+
 </main>
+
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
 <script>
-const firebaseConfig = { databaseURL: "https://mas-tolong-default-rtdb.asia-southeast1.firebasedatabase.app" };
-if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-const db = firebase.database();
+"use strict";
 
-let currentUserSession = null, capturedFaceBase64 = null, mediaStream = null;
-let isRegisterMode = false, isDriverOnline = true, driverNavMap = null, driverRoutingControl = null, lastNotifiedOrderId = '';
+/* =====================================================
+   FIREBASE
+   Gunakan konfigurasi database proyek yang sudah ada.
+   ===================================================== */
 
-async function hashPassword(str) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+const firebaseConfig = {
+  databaseURL: "https://mas-tolong-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('masTolongDriverSession');
+const db = firebase.database();
+
+
+/* =====================================================
+   STATUS APLIKASI
+   ===================================================== */
+
+let currentUserSession = null;
+let capturedFaceBase64 = null;
+let mediaStream = null;
+let isRegisterMode = false;
+let isDriverOnline = true;
+let driverNavMap = null;
+let driverRoutingControl = null;
+let lastNotifiedOrderId = "";
+let gpsTimer = null;
+let walletListenerAttached = false;
+let walletRef = null;
+let orderListenerAttached = false;
+let currentAcceptedOrderId = null;
+let navigationOrderId = null;
+let isCompletingOrder = false;
+
+
+/* =====================================================
+   FUNGSI BANTUAN
+   ===================================================== */
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+function formatRupiah(value) {
+  const number = Number(value);
+  return "Rp " + (Number.isFinite(number) ? number : 0)
+    .toLocaleString("id-ID");
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function(char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
+}
+
+function validNumber(value) {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function showError(message) {
+  alert(message);
+}
+
+async function hashPassword(str) {
+  const buffer = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(str)
+  );
+
+  return Array.from(new Uint8Array(buffer))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+
+/* =====================================================
+   INISIALISASI
+   ===================================================== */
+
+window.addEventListener("DOMContentLoaded", function() {
+  const saved = localStorage.getItem("masTolongDriverSession");
+
   if (saved) {
-    currentUserSession = JSON.parse(saved);
-    openDashboard();
-  } else { initCamera(); }
+    try {
+      currentUserSession = JSON.parse(saved);
+
+      if (currentUserSession && currentUserSession.id) {
+        openDashboard();
+      } else {
+        localStorage.removeItem("masTolongDriverSession");
+        initCamera();
+      }
+    } catch (error) {
+      localStorage.removeItem("masTolongDriverSession");
+      initCamera();
+    }
+  } else {
+    initCamera();
+  }
+
   listenRealtimeCloudOrders();
 });
 
-function initCamera() {
-  const video = document.getElementById('webcam');
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-      .then(stream => { mediaStream = stream; video.srcObject = stream; });
+
+/* =====================================================
+   KAMERA
+   Catatan: foto bukan verifikasi identitas atau liveness.
+   ===================================================== */
+
+async function initCamera() {
+  const video = $("webcam");
+  const hint = $("livenessHint");
+
+  if (!navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia) {
+    hint.textContent = "Kamera tidak tersedia di browser ini.";
+    return;
+  }
+
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "user"
+      },
+      audio: false
+    });
+
+    video.srcObject = mediaStream;
+    hint.textContent = "Posisikan wajah di tengah bingkai.";
+  } catch (error) {
+    hint.textContent = "Izinkan akses kamera untuk mengambil foto.";
   }
 }
 
 function stopCamera() {
-  if (mediaStream) { mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop());
+    mediaStream = null;
+  }
 }
 
 function captureLiveFace() {
-  const video = document.getElementById('webcam');
-  const canvas = document.getElementById('canvasSnap');
-  const ctx = canvas.getContext('2d');
-  canvas.width = 120; canvas.height = 90;
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  capturedFaceBase64 = canvas.toDataURL('image/jpeg', 0.3);
-  document.getElementById('livenessHint').innerText = "✅ Biometrik Wajah Terverifikasi!";
-  document.getElementById('livenessHint').style.color = "#10b981";
-}
+  const video = $("webcam");
+  const canvas = $("canvasSnap");
 
-function toggleRegisterMode() {
-  isRegisterMode = !isRegisterMode;
-  document.getElementById('authTitle').innerText = isRegisterMode ? 'Pendaftaran Mitra Driver Baru' : 'Masuk Mitra Driver';
-  document.getElementById('btnAuthAction').innerText = isRegisterMode ? 'Daftar Sebagai Driver' : 'Masuk Ke Aplikasi Driver';
-  document.getElementById('btnRegisterToggle').innerText = isRegisterMode ? 'Sudah Punya Akun? Masuk Disini' : 'Belum Punya Akun? Daftar Driver Baru';
-  document.getElementById('registerExtraFields').style.display = isRegisterMode ? 'block' : 'none';
-}
-
-async function processLoginSubmit() {
-  const username = document.getElementById('loginUsernameInput').value.trim();
-  const rawPass = document.getElementById('loginPasswordInput').value.trim();
-  const wa = document.getElementById('loginWaInput').value.trim();
-
-  if (!username || !rawPass || !wa) return alert("Lengkapi Username, Nomor WA, dan Password!");
-  if (!capturedFaceBase64) return alert("Wajib melakukan Scan Biometrik Wajah!");
-
-  const passHash = await hashPassword(rawPass);
-
-  if (isRegisterMode) {
-    const plat = document.getElementById('regPlatInput').value.trim();
-    const sim = document.getElementById('regSimInput').value.trim();
-
-    if (!plat || !sim) return alert("Lengkapi Nomor Plat Motor dan Nomor SIM C Anda!");
-
-    db.ref('users/' + username).once('value', (snap) => {
-      if (snap.exists()) { alert("⚠️ Username Driver ini sudah terdaftar!"); } 
-      else {
-        db.ref('users').once('value', (allSnap) => {
-          let count = allSnap.val() ? Object.keys(allSnap.val()).length + 1 : 1;
-          let generatedNoUrut = "#DRV-" + count.toString().padStart(3, '0');
-
-          const newDriver = {
-            username: username,
-            passwordHash: passHash,
-            waNumber: wa,
-            platNomor: plat,
-            simNumber: sim,
-            faceImg: capturedFaceBase64,
-            noUrutAdmin: generatedNoUrut,
-            role: 'driver',
-            registeredAt: new Date().toLocaleString("id-ID")
-          };
-
-          db.ref('users/' + username).set(newDriver, () => {
-            db.ref('wallets/' + username).set(0);
-            alert(`✅ Pendaftaran Driver Berhasil!\nUsername: ${username}\nPlat: ${plat}\nSilakan tekan 'Masuk Ke Aplikasi Driver'.`);
-            toggleRegisterMode();
-          });
-        });
-      }
-    });
+  if (!video.videoWidth || !video.videoHeight) {
+    showError("Kamera belum siap. Izinkan akses kamera terlebih dahulu.");
     return;
   }
 
-  db.ref('users/' + username).once('value', (snap) => {
-    let uData = snap.val();
-    if (!uData) return alert("❌ AKUN DRIVER BELUM TERDAFTAR!");
-    if (uData.passwordHash === passHash || uData.password === rawPass) {
-      stopCamera();
-      currentUserSession = { id: username, name: username, plat: uData.platNomor || "-", role: 'driver' };
-      localStorage.setItem('masTolongDriverSession', JSON.stringify(currentUserSession));
-      openDashboard();
-    } else { alert("❌ PASSWORD SALAH!"); }
-  });
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = 320;
+  canvas.height = Math.round(
+    320 * video.videoHeight / video.videoWidth
+  );
+
+  ctx.save();
+  ctx.translate(canvas.width, 0);
+  ctx.scale(-1, 1);
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  capturedFaceBase64 = canvas.toDataURL("image/jpeg", 0.65);
+
+  $("livenessHint").textContent = "Foto berhasil diambil.";
+  $("livenessHint").style.color = "#58e6a4";
+
+  alert(
+    "Foto berhasil diambil. Perlu diketahui, fitur ini hanya " +
+    "mengambil foto dan belum memverifikasi identitas wajah."
+  );
 }
 
+
+/* =====================================================
+   LOGIN DAN PENDAFTARAN
+   ===================================================== */
+
+function toggleRegisterMode() {
+  isRegisterMode = !isRegisterMode;
+
+  $("authTitle").textContent = isRegisterMode
+    ? "Daftar Mitra Driver"
+    : "Selamat Datang, Mitra!";
+
+  $("btnAuthAction").textContent = isRegisterMode
+    ? "Daftar Sebagai Driver"
+    : "Masuk ke Aplikasi";
+
+  $("btnRegisterToggle").textContent = isRegisterMode
+    ? "Sudah Punya Akun? Masuk"
+    : "Belum Punya Akun? Daftar Driver";
+
+  $("registerExtraFields").hidden = !isRegisterMode;
+
+  $("loginPasswordInput").autocomplete = isRegisterMode
+    ? "new-password"
+    : "current-password";
+}
+
+async function processLoginSubmit() {
+  const username = $("loginUsernameInput").value.trim();
+  const rawPass = $("loginPasswordInput").value;
+  const wa = $("loginWaInput").value.trim();
+  const button = $("btnAuthAction");
+
+  if (!username || !rawPass || !wa) {
+    return showError("Lengkapi username, nomor WhatsApp, dan password.");
+  }
+
+  if (!capturedFaceBase64) {
+    return showError("Silakan ambil foto wajah terlebih dahulu.");
+  }
+
+  if (!/^[a-zA-Z0-9_-]{3,40}$/.test(username)) {
+    return showError(
+      "Username harus terdiri dari 3-40 karakter: huruf, angka, _ atau -."
+    );
+  }
+
+  if (rawPass.length < 6) {
+    return showError("Password minimal 6 karakter.");
+  }
+
+  if (!/^[0-9+\-\s()]{8,20}$/.test(wa)) {
+    return showError("Periksa kembali nomor WhatsApp Anda.");
+  }
+
+  button.disabled = true;
+  button.style.opacity = ".65";
+
+  try {
+    const passHash = await hashPassword(rawPass);
+
+    if (isRegisterMode) {
+      await registerDriver(username, passHash, wa);
+    } else {
+      await loginDriver(username, passHash);
+    }
+  } catch (error) {
+    console.error(error);
+    showError(
+      "Proses gagal. Periksa koneksi internet dan aturan Firebase."
+    );
+  } finally {
+    button.disabled = false;
+    button.style.opacity = "1";
+  }
+}
+
+async function registerDriver(username, passHash, wa) {
+  const plat = $("regPlatInput").value.trim().toUpperCase();
+  const sim = $("regSimInput").value.trim();
+
+  if (!plat || !sim) {
+    return showError("Lengkapi nomor polisi dan nomor SIM C.");
+  }
+
+  const userRef = db.ref("users/" + username);
+  const snap = await userRef.once("value");
+
+  if (snap.exists()) {
+    return showError("Username tersebut sudah terdaftar.");
+  }
+
+  const allSnap = await db.ref("users").once("value");
+  const users = allSnap.val() || {};
+  const count = Object.keys(users).length + 1;
+
+  const newDriver = {
+    username: username,
+    passwordHash: passHash,
+    waNumber: wa,
+    platNomor: plat,
+    simNumber: sim,
+    faceImg: capturedFaceBase64,
+    noUrutAdmin: "#DRV-" + String(count).padStart(3, "0"),
+    role: "driver",
+    registeredAt: new Date().toISOString()
+  };
+
+  await userRef.set(newDriver);
+  await db.ref("wallets/" + username).set(0);
+
+  alert(
+    "Pendaftaran berhasil!\n" +
+    "Username: " + username + "\n" +
+    "Plat: " + plat + "\n\n" +
+    "Silakan masuk menggunakan akun Anda."
+  );
+
+  toggleRegisterMode();
+}
+
+async function loginDriver(username, passHash) {
+  const snap = await db.ref("users/" + username).once("value");
+  const user = snap.val();
+
+  if (!user) {
+    return showError("Akun driver belum terdaftar.");
+  }
+
+  if (user.role && user.role !== "driver") {
+    return showError("Akun ini bukan akun driver.");
+  }
+
+  if (user.passwordHash !== passHash) {
+    return showError("Password salah.");
+  }
+
+  stopCamera();
+
+  currentUserSession = {
+    id: username,
+    name: user.name || user.nama || username,
+    plat: user.platNomor || "-",
+    role: "driver"
+  };
+
+  localStorage.setItem(
+    "masTolongDriverSession",
+    JSON.stringify(currentUserSession)
+  );
+
+  openDashboard();
+}
+
+
+/* =====================================================
+   DASHBOARD
+   ===================================================== */
+
 function openDashboard() {
-  document.getElementById('viewAuth').style.display = 'none';
-  document.getElementById('viewDriver').style.display = 'block';
-  document.getElementById('btnLogout').style.display = 'block';
-  document.getElementById('driverDisplayName').innerText = currentUserSession.name + " (" + currentUserSession.id + ")";
-  document.getElementById('driverPlatDisplay').innerText = currentUserSession.plat || "-";
+  $("viewAuth").hidden = true;
+  $("viewDriver").hidden = false;
+  $("btnLogout").style.display = "flex";
+
+  $("driverDisplayName").textContent =
+    currentUserSession.name + " (" + currentUserSession.id + ")";
+
+  $("driverPlatDisplay").textContent = currentUserSession.plat || "-";
+  $("driverPlatTile").textContent = currentUserSession.plat || "-";
+  $("driverIdDisplay").textContent = currentUserSession.id;
+
+  updateDriverStatusUI();
+
   startUpdatingDriverGPS();
   listenDriverWallet();
+  renderOrdersFromDatabase();
+
+  setTimeout(function() {
+    if (driverNavMap) driverNavMap.invalidateSize();
+  }, 300);
 }
 
 function logout() {
-  localStorage.removeItem('masTolongDriverSession');
+  if (!confirm("Yakin ingin keluar dari akun driver?")) return;
+
+  stopCamera();
+
+  if (gpsTimer) {
+    clearInterval(gpsTimer);
+    gpsTimer = null;
+  }
+
+  if (walletRef && walletListenerAttached) {
+    walletRef.off("value");
+    walletListenerAttached = false;
+  }
+
+  if (currentUserSession) {
+    db.ref("activeDrivers/" + currentUserSession.id).remove()
+      .catch(console.error);
+  }
+
+  localStorage.removeItem("masTolongDriverSession");
+  currentUserSession = null;
   location.reload();
 }
 
-function startUpdatingDriverGPS() {
-  if (navigator.geolocation) {
-    setInterval(() => {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        if (currentUserSession && isDriverOnline) {
-          db.ref('activeDrivers/' + currentUserSession.id).set({
-            driverId: currentUserSession.id, driverName: currentUserSession.name,
-            lat: pos.coords.latitude, lng: pos.coords.longitude, lastUpdate: Date.now()
-          });
-        }
-      });
-    }, 4000);
+
+/* =====================================================
+   STATUS ONLINE / OFFLINE
+   ===================================================== */
+
+function updateDriverStatusUI() {
+  const text = isDriverOnline ? "ONLINE" : "OFFLINE";
+
+  $("driverStatusText").textContent = text;
+  $("statusPill").style.background = isDriverOnline
+    ? "#e7f8ef"
+    : "#f0f1f1";
+
+  $("statusPill").style.color = isDriverOnline
+    ? "#008957"
+    : "#69756d";
+
+  $("btnDriverStatus").textContent = isDriverOnline
+    ? "Jadi Offline"
+    : "Jadi Online";
+}
+
+async function toggleDriverOnlineStatus() {
+  if (!currentUserSession) return;
+
+  if (!isDriverOnline) {
+    const walletSnap = await db.ref(
+      "wallets/" + currentUserSession.id
+    ).once("value");
+
+    const balance = Number(walletSnap.val() || 0);
+
+    if (balance <= -25000) {
+      showError("Saldo melewati batas minus. Hubungi admin terlebih dahulu.");
+      return;
+    }
+  }
+
+  isDriverOnline = !isDriverOnline;
+  updateDriverStatusUI();
+
+  const ref = db.ref("activeDrivers/" + currentUserSession.id);
+
+  if (!isDriverOnline) {
+    await ref.remove();
+  } else {
+    updateDriverGPSOnce();
   }
 }
 
-function listenDriverWallet() {
-  db.ref('wallets/' + currentUserSession.id).on('value', (snap) => {
-    let depositBalance = snap.val() || 0;
-    let depositEl = document.getElementById('driverDepositDisplay');
-    let alertBox = document.getElementById('driverMinusAlertBox');
 
-    if (depositBalance < 0) {
-      depositEl.style.color = 'var(--red)';
-      depositEl.innerText = "-Rp " + Math.abs(depositBalance).toLocaleString('id-ID');
-    } else {
-      depositEl.style.color = 'var(--green)';
-      depositEl.innerText = "Rp " + depositBalance.toLocaleString('id-ID');
+/* =====================================================
+   GPS DRIVER
+   ===================================================== */
+
+function startUpdatingDriverGPS() {
+  if (gpsTimer) {
+    clearInterval(gpsTimer);
+    gpsTimer = null;
+  }
+
+  if (!navigator.geolocation) {
+    console.warn("Geolocation tidak didukung browser.");
+    return;
+  }
+
+  updateDriverGPSOnce();
+
+  gpsTimer = setInterval(function() {
+    if (currentUserSession && isDriverOnline) {
+      updateDriverGPSOnce();
     }
+  }, 10000);
+}
 
-    if (depositBalance <= -25000) {
-      alertBox.style.display = 'block';
-      document.getElementById('minusAmountDisplay').innerText = "-Rp " + Math.abs(depositBalance).toLocaleString('id-ID');
+function updateDriverGPSOnce() {
+  if (!currentUserSession || !navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      if (!currentUserSession || !isDriverOnline) return;
+
+      const coords = position.coords;
+
+      db.ref("activeDrivers/" + currentUserSession.id).update({
+        driverId: currentUserSession.id,
+        driverName: currentUserSession.name,
+        lat: coords.latitude,
+        lng: coords.longitude,
+        lastUpdate: Date.now()
+      }).catch(function(error) {
+        console.error("GPS update gagal:", error);
+      });
+    },
+    function(error) {
+      console.warn("GPS tidak tersedia:", error.message);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 5000
+    }
+  );
+}
+
+
+/* =====================================================
+   SALDO DEPOSIT
+   ===================================================== */
+
+function listenDriverWallet() {
+  if (!currentUserSession || walletListenerAttached) return;
+
+  walletRef = db.ref("wallets/" + currentUserSession.id);
+  walletListenerAttached = true;
+
+  walletRef.on("value", function(snap) {
+    const balance = Number(snap.val() || 0);
+
+    $("driverDepositDisplay").textContent =
+      (balance < 0 ? "-Rp " : "Rp ") +
+      Math.abs(balance).toLocaleString("id-ID");
+
+    $("driverDepositDisplay").style.color =
+      balance < 0 ? "#ffdddd" : "#ffffff";
+
+    const suspended = balance <= -25000;
+
+    $("driverMinusAlertBox").hidden = !suspended;
+
+    $("minusAmountDisplay").textContent =
+      "-Rp " + Math.abs(balance).toLocaleString("id-ID");
+
+    $("driverAccountStatus").textContent =
+      suspended ? "Perlu Top Up" : "Aktif";
+
+    if (suspended) {
       isDriverOnline = false;
-      document.getElementById('driverStatusText').innerText = "SUSPENDED (Minus Max)";
-      document.getElementById('driverStatusText').style.color = "var(--red)";
-      db.ref('activeDrivers/' + currentUserSession.id).remove();
-    } else { alertBox.style.display = 'none'; }
+      updateDriverStatusUI();
+
+      db.ref("activeDrivers/" + currentUserSession.id)
+        .remove()
+        .catch(console.error);
+    }
+  }, function(error) {
+    console.error("Gagal membaca saldo:", error);
   });
 }
 
+
+/* =====================================================
+   NOTIFIKASI SUARA
+   ===================================================== */
+
 function playLoudDriverAudioAlert() {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    let utterance = new SpeechSynthesisUtterance("Mas Tolong, Mas! Ada pesanan masuk!");
-    utterance.lang = 'id-ID'; utterance.rate = 1.1;
-    window.speechSynthesis.speak(utterance);
-  }
+  if (!("speechSynthesis" in window)) return;
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(
+    "Mas Tolong, Mas! Ada pesanan masuk!"
+  );
+
+  utterance.lang = "id-ID";
+  utterance.rate = 1.0;
+
+  window.speechSynthesis.speak(utterance);
 }
 
-function listenRealtimeCloudOrders() {
-  db.ref('orders').on('value', (snap) => {
-    const data = snap.val();
-    const ordersList = data ? Object.values(data).reverse() : [];
 
-    if (currentUserSession && isDriverOnline) {
-      let myAssignedOrder = ordersList.find(o => o.status === 'SEARCHING' && o.matchedDriverId === currentUserSession.id);
-      if (myAssignedOrder && lastNotifiedOrderId !== myAssignedOrder.id) {
-        lastNotifiedOrderId = myAssignedOrder.id;
+/* =====================================================
+   PESANAN REALTIME
+   ===================================================== */
+
+function listenRealtimeCloudOrders() {
+  if (orderListenerAttached) return;
+  orderListenerAttached = true;
+
+  db.ref("orders").on("value", function(snap) {
+    const data = snap.val() || {};
+
+    const ordersList = Object.entries(data)
+      .map(function(entry) {
+        const order = entry[1] || {};
+        order.id = order.id || entry[0];
+        return order;
+      })
+      .reverse();
+
+    if (!currentUserSession) return;
+
+    if (isDriverOnline) {
+      const assigned = ordersList.find(function(order) {
+        return order.status === "SEARCHING" &&
+          order.matchedDriverId === currentUserSession.id;
+      });
+
+      if (assigned && lastNotifiedOrderId !== assigned.id) {
+        lastNotifiedOrderId = assigned.id;
         playLoudDriverAudioAlert();
       }
     }
 
-    if (currentUserSession) {
-      let myOrders = ordersList.filter(o => o.status === 'SEARCHING' && o.matchedDriverId === currentUserSession.id);
-      let acceptedOrder = ordersList.find(o => o.status === 'ACCEPTED' && o.driverId === currentUserSession.id);
-      let driverListDiv = document.getElementById('driverOrdersList');
-
-      if (acceptedOrder) {
-        document.getElementById('driverNavSection').style.display = 'block';
-        initDriverLiveNavigation(acceptedOrder);
-        driverListDiv.innerHTML = `<div class="order-card" style="border: 2px solid var(--green); background: #064e3b;"><b>🚀 ANDA MENJALANKAN ORDER (${acceptedOrder.distance}):</b><br>Pelanggan: ${acceptedOrder.customerName}<br>Bayar: ${acceptedOrder.paymentMethod}<br>Net Driver: <b style="color:var(--green);">Rp ${acceptedOrder.driverNetEarnings.toLocaleString('id-ID')}</b></div>`;
-      } else {
-        document.getElementById('driverNavSection').style.display = 'none';
-        if (driverListDiv) {
-          driverListDiv.innerHTML = myOrders.length ? myOrders.map(o => `
-            <div class="order-card">
-              <b>🔥 [ORDER TERDEKAT] ${o.customerName}</b><br>
-              📍 Jemput: ${o.pickup}<br>🏁 Tujuan: ${o.dest}<br>
-              💳 Bayar: <b>${o.paymentMethod}</b> | Jarak: ${o.distance}<br>
-              💰 Total Tarif: Rp ${o.totalOngkir.toLocaleString('id-ID')} | <b style="color:var(--green);">Net Driver: Rp ${o.driverNetEarnings.toLocaleString('id-ID')}</b><br>
-              <button class="btn btn-green" style="padding:8px; font-size:12px; margin-top:8px;" onclick="acceptOrderByDriver('${o.id}')">Terima Orderan Ini 🚀</button>
-            </div>
-          `).join('') : "Radar aktif. Menunggu orderan terdekat masuk...";
-        }
-      }
-    }
+    renderOrders(ordersList);
+  }, function(error) {
+    console.error("Gagal memuat pesanan:", error);
+    $("driverOrdersList").innerHTML =
+      '<div class="empty-state">Gagal memuat pesanan. Periksa koneksi.</div>';
   });
 }
+
+async function renderOrdersFromDatabase() {
+  if (!currentUserSession) return;
+
+  try {
+    const snap = await db.ref("orders").once("value");
+    const data = snap.val() || {};
+
+    const ordersList = Object.entries(data)
+      .map(function(entry) {
+        const order = entry[1] || {};
+        order.id = order.id || entry[0];
+        return order;
+      })
+      .reverse();
+
+    renderOrders(ordersList);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function renderOrders(ordersList) {
+  if (!currentUserSession) return;
+
+  const driverId = currentUserSession.id;
+
+  const myOrders = ordersList.filter(function(order) {
+    return order.status === "SEARCHING" &&
+      order.matchedDriverId === driverId;
+  });
+
+  const acceptedOrder = ordersList.find(function(order) {
+    return order.status === "ACCEPTED" &&
+      order.driverId === driverId;
+  });
+
+  const list = $("driverOrdersList");
+
+  if (acceptedOrder) {
+    currentAcceptedOrderId = acceptedOrder.id;
+
+    $("driverNavSection").hidden = false;
+
+    if (navigationOrderId !== acceptedOrder.id) {
+      initDriverLiveNavigation(acceptedOrder);
+    }
+
+    list.innerHTML = `
+      <div class="order-card active">
+        <div class="order-top">
+          <h4>🚀 Perjalanan Aktif</h4>
+          <span class="order-badge">SEDANG JALAN</span>
+        </div>
+
+        <div class="route-line">
+          <div class="route-markers">
+            <span class="marker-pickup"></span>
+            <span class="route-stem"></span>
+            <span class="marker-dest"></span>
+          </div>
+          <div class="route-text">
+            <strong>PELANGGAN</strong>
+            ${escapeHTML(acceptedOrder.customerName || "-")}
+            <br><br>
+            <strong>PEMBAYARAN</strong>
+            ${escapeHTML(acceptedOrder.paymentMethod || "-")}
+          </div>
+        </div>
+
+        <div class="order-details">
+          <div>
+            <div class="detail-label">Jarak</div>
+            <div class="detail-value">
+              ${escapeHTML(acceptedOrder.distance || "-")}
+            </div>
+          </div>
+          <div>
+            <div class="detail-label">Pendapatan Driver</div>
+            <div class="detail-value earnings">
+              ${formatRupiah(acceptedOrder.driverNetEarnings)}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+  currentAcceptedOrderId = null;
+  $("driverNavSection").hidden = true;
+
+  if (!myOrders.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🛵</div>
+        <b>Belum Ada Pesanan</b><br>
+        Pesanan yang cocok dengan akun Anda akan muncul di sini.
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = myOrders.map(function(order) {
+    return `
+      <div class="order-card">
+        <div class="order-top">
+          <h4>📦 Pesanan Pelanggan</h4>
+          <span class="order-badge">PESANAN BARU</span>
+        </div>
+
+        <div class="route-line">
+          <div class="route-markers">
+            <span class="marker-pickup"></span>
+            <span class="route-stem"></span>
+            <span class="marker-dest"></span>
+          </div>
+
+          <div class="route-text">
+            <strong>LOKASI JEMPUT</strong>
+            ${escapeHTML(order.pickup || "-")}
+            <br><br>
+            <strong>LOKASI TUJUAN</strong>
+            ${escapeHTML(order.dest || "-")}
+          </div>
+        </div>
+
+        <div class="order-details">
+          <div>
+            <div class="detail-label">Pembayaran</div>
+            <div class="detail-value">
+              ${escapeHTML(order.paymentMethod || "-")}
+            </div>
+          </div>
+
+          <div>
+            <div class="detail-label">Jarak</div>
+            <div class="detail-value">
+              ${escapeHTML(order.distance || "-")}
+            </div>
+          </div>
+
+          <div>
+            <div class="detail-label">Total Tarif</div>
+            <div class="detail-value">
+              ${formatRupiah(order.totalOngkir)}
+            </div>
+          </div>
+
+          <div>
+            <div class="detail-label">Pendapatan Driver</div>
+            <div class="detail-value earnings">
+              ${formatRupiah(order.driverNetEarnings)}
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-green"
+          onclick="acceptOrderByDriver('${escapeHTML(order.id)}')">
+          Terima Pesanan →
+        </button>
+      </div>
+    `;
+  }).join("");
+}
+
+
+/* =====================================================
+   MENERIMA PESANAN
+   ===================================================== */
+
+async function acceptOrderByDriver(orderId) {
+  if (!currentUserSession || !isDriverOnline) {
+    return showError("Anda sedang offline.");
+  }
+
+  const walletSnap = await db.ref(
+    "wallets/" + currentUserSession.id
+  ).once("value");
+
+  if (Number(walletSnap.val() || 0) <= -25000) {
+    return showError("Saldo deposit telah mencapai batas minus.");
+  }
+
+  const orderRef = db.ref("orders/" + orderId);
+  const snap = await orderRef.once("value");
+  const order = snap.val();
+
+  if (!order || order.status !== "SEARCHING") {
+    return showError("Pesanan sudah tidak tersedia.");
+  }
+
+  if (order.matchedDriverId !== currentUserSession.id) {
+    return showError("Pesanan ini bukan untuk akun Anda.");
+  }
+
+  const updates = {
+    status: "ACCEPTED",
+    driverId: currentUserSession.id,
+    driverName:
+      currentUserSession.name + " (" + currentUserSession.id + ")"
+  };
+
+  await orderRef.update(updates);
+
+  alert("Pesanan diterima. Silakan ikuti navigasi perjalanan.");
+}
+
+
+/* =====================================================
+   NAVIGASI LEAFLET
+   ===================================================== */
 
 function initDriverLiveNavigation(order) {
-  document.getElementById('driverNavSection').style.display = 'block';
-  if (!driverNavMap) {
-    driverNavMap = L.map('driverLiveNavMap').setView([order.pickupLat, order.pickupLng], 14);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(driverNavMap);
+  if (!validNumber(order.pickupLat) ||
+      !validNumber(order.pickupLng) ||
+      !validNumber(order.destLat) ||
+      !validNumber(order.destLng)) {
+    $("driverNavInfo").textContent =
+      "Koordinat penjemputan atau tujuan belum tersedia.";
+    $("driverNavSection").hidden = false;
+    return;
   }
-  if (driverRoutingControl) { driverNavMap.removeControl(driverRoutingControl); }
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition((pos) => {
+  $("driverNavSection").hidden = false;
+  navigationOrderId = order.id;
+
+  if (!driverNavMap) {
+    driverNavMap = L.map("driverLiveNavMap").setView(
+      [order.pickupLat, order.pickupLng], 14
+    );
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19
+      }
+    ).addTo(driverNavMap);
+  }
+
+  if (driverRoutingControl) {
+    driverNavMap.removeControl(driverRoutingControl);
+    driverRoutingControl = null;
+  }
+
+  $("driverNavInfo").textContent = "Menghitung rute perjalanan...";
+
+  if (!navigator.geolocation) {
+    $("driverNavInfo").textContent =
+      "Browser tidak mendukung lokasi GPS.";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      if (navigationOrderId !== order.id) return;
+
+      const currentLat = position.coords.latitude;
+      const currentLng = position.coords.longitude;
+
       driverRoutingControl = L.Routing.control({
-        waypoints: [L.latLng(pos.coords.latitude, pos.coords.longitude), L.latLng(order.pickupLat, order.pickupLng), L.latLng(order.destLat, order.destLng)],
-        createMarker: (i, wp) => L.marker(wp.latLng).bindPopup(i === 0 ? "Posisi Anda" : (i === 1 ? "Jemput: " + order.pickup : "Tujuan: " + order.dest))
+        waypoints: [
+          L.latLng(currentLat, currentLng),
+          L.latLng(order.pickupLat, order.pickupLng),
+          L.latLng(order.destLat, order.destLng)
+        ],
+
+        addWaypoints: false,
+        draggableWaypoints: false,
+        fitSelectedRoutes: true,
+        show: false,
+
+        createMarker: function(index, waypoint) {
+          const labels = [
+            "Posisi Anda",
+            "Penjemputan: " + (order.pickup || ""),
+            "Tujuan: " + (order.dest || "")
+          ];
+
+          return L.marker(waypoint.latLng)
+            .bindPopup(escapeHTML(labels[index] || ""));
+        }
       }).addTo(driverNavMap);
 
-      driverRoutingControl.on('routesfound', function(e) {
-        let summary = e.routes[0].summary;
-        document.getElementById('driverNavInfo').innerHTML = `⚡ Rute Aktif: <b>${(summary.totalDistance / 1000).toFixed(1)} km</b> | Pembayaran: <b>${order.paymentMethod}</b><br>💰 Net Driver: <b style="color:var(--green);">Rp ${order.driverNetEarnings.toLocaleString('id-ID')}</b>`;
+      driverRoutingControl.on("routesfound", function(event) {
+        if (navigationOrderId !== order.id) return;
+
+        const route = event.routes[0];
+        const distanceKm =
+          (route.summary.totalDistance / 1000).toFixed(1);
+
+        $("driverNavInfo").innerHTML =
+          "📍 Jarak rute: <b>" + distanceKm + " km</b><br>" +
+          "💳 Pembayaran: <b>" +
+          escapeHTML(order.paymentMethod || "-") + "</b><br>" +
+          "💰 Pendapatan: <b>" +
+          formatRupiah(order.driverNetEarnings) + "</b>";
       });
+
+      driverRoutingControl.on("routingerror", function() {
+        $("driverNavInfo").textContent =
+          "Rute tidak dapat dihitung. Periksa koneksi internet.";
+      });
+
+      setTimeout(function() {
+        if (driverNavMap) driverNavMap.invalidateSize();
+      }, 250);
+    },
+
+    function(error) {
+      $("driverNavInfo").textContent =
+        "Lokasi GPS tidak tersedia. Izinkan akses lokasi untuk navigasi.";
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 12000,
+      maximumAge: 5000
+    }
+  );
+}
+
+
+/* =====================================================
+   MENYELESAIKAN PERJALANAN
+   ===================================================== */
+
+async function completeActiveOrder() {
+  if (!currentUserSession || isCompletingOrder) return;
+
+  if (!currentAcceptedOrderId) {
+    return showError("Tidak ditemukan perjalanan aktif.");
+  }
+
+  if (!confirm("Yakin perjalanan ini sudah selesai?")) return;
+
+  isCompletingOrder = true;
+
+  try {
+    const orderRef = db.ref("orders/" + currentAcceptedOrderId);
+    const snap = await orderRef.once("value");
+    const order = snap.val();
+
+    if (!order ||
+        order.status !== "ACCEPTED" ||
+        order.driverId !== currentUserSession.id) {
+      return showError("Pesanan tidak valid atau sudah berubah.");
+    }
+
+    /*
+      PERHATIAN:
+      Pemotongan komisi dan perubahan saldo seharusnya dilakukan
+      melalui backend tepercaya atau Firebase Cloud Functions
+      dengan transaksi atomik, bukan hanya dari browser.
+      Bagian ini mempertahankan alur status dasar aplikasi awal.
+    */
+
+    await orderRef.update({
+      status: "COMPLETED"
     });
+
+    $("driverNavSection").hidden = true;
+    navigationOrderId = null;
+    currentAcceptedOrderId = null;
+
+    if (driverRoutingControl && driverNavMap) {
+      driverNavMap.removeControl(driverRoutingControl);
+      driverRoutingControl = null;
+    }
+
+    alert(
+      "Perjalanan ditandai selesai. Pastikan perhitungan komisi " +
+      "telah diproses oleh sistem pembayaran."
+    );
+
+    await renderOrdersFromDatabase();
+
+  } catch (error) {
+    console.error(error);
+    showError("Perjalanan gagal diperbarui. Coba lagi.");
+  } finally {
+    isCompletingOrder = false;
   }
 }
 
-function acceptOrderByDriver(orderId) {
-  db.ref('orders/' + orderId).update({
-    status: 'ACCEPTED', driverId: currentUserSession.id, driverName: currentUserSession.name + " (" + currentUserSession.id + ")"
-  }, () => { alert("Orderan Diterima! Navigasi Rute Aktif."); });
-}
-
-function completeActiveOrder() {
-  db.ref('orders').once('value', (snap) => {
-    let orders = snap.val() || {};
-    Object.entries(orders).forEach(([id, o]) => {
-      if (o.driverId === currentUserSession.id && o.status === 'ACCEPTED') {
-        if (o.paymentMethod === 'CASH') {
-          db.ref('wallets/' + currentUserSession.id).once('value', (walSnap) => {
-            db.ref('wallets/' + currentUserSession.id).set((walSnap.val() || 0) - o.platformFee);
-          });
-        }
-        db.ref('orders/' + id).update({ status: 'COMPLETED' }, () => {
-          alert("Perjalanan Selesai! Komisi Admin 10% Terpotong Otomatis.");
-          document.getElementById('driverNavSection').style.display = 'none';
-        });
-      }
-    });
-  });
-}
-
-function toggleDriverOnlineStatus() {
-  isDriverOnline = !isDriverOnline;
-  document.getElementById('driverStatusText').innerText = isDriverOnline ? "ONLINE" : "OFFLINE";
-  if (!isDriverOnline) db.ref('activeDrivers/' + currentUserSession.id).remove();
-}
 </script>
 </body>
 </html>
